@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct AppendBuffer {
+struct append_buffer {
   char* buf;
   int len;
 };
 
-void init_buffer(struct AppendBuffer* abuff) {
+void init_buffer(struct append_buffer* abuff) {
     abuff->buf = NULL;
     abuff->len = 0;
 }
@@ -17,7 +17,7 @@ void init_buffer(struct AppendBuffer* abuff) {
 * @param abuff append buffer
 * @param str newly appended string
 */
-void append_to_buffer(struct AppendBuffer* abuff, char* str) {
+void append_to_buffer(struct append_buffer* abuff, char* str) {
   if (abuff->buf == NULL) {
     abuff->buf = malloc(strlen(str) + 1);
     if (abuff->buf == NULL) {
@@ -37,12 +37,12 @@ void append_to_buffer(struct AppendBuffer* abuff, char* str) {
   
 }
 
-void free_abuff(struct AppendBuffer* abuff) {
+void free_abuff(struct append_buffer* abuff) {
   free(abuff->buf);
 }
 
 int main() {
-  struct AppendBuffer abuff;
+  struct append_buffer abuff;
   init_buffer(&abuff);
   append_to_buffer(&abuff, "Hello");
   append_to_buffer(&abuff, " World!");

@@ -1,71 +1,140 @@
-#include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <sys/ioctl.h>
+#include <stdlib.h>
 #include <termios.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
-#define CTRL_KEY(k) ((k) & 0x1f)
+void clear();
 
-struct termios prev_termios;
+// ---- Append buffer ----
+struct append_buffer {
+  char* buf;
+  int len;
+};
 
-void die(const char* s) {
-  perror(s);
-  exit(1);
+struct append_buffer g_append_buffer;
+
+void init_buffer(struct append_buffer* abuff) {
+    abuff->buf = NULL;
+    abuff->len = 0;
 }
 
-void disable_raw_mode() {
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &prev_termios) == -1)
-      die("tcsetattr");
+/**
+* Appends a string to a dynamic string buffer
+* @param abuff append buffer
+* @param str newly appended string
+*/
+void append_to_buffer(struct append_buffer* abuff, char* str) {
+  if (abuff->buf == NULL) {
+    abuff->buf = malloc(strlen(str) + 1);
+    if (abuff->buf == NULL) {
+      perror("Allocating space failure");
+      exit(1);
+    }
+    abuff->len = strlen(str);
+
+    strcpy(abuff->buf, str);
+  }
+  else {
+    abuff->len += strlen(str);
+    abuff->buf = realloc(abuff->buf, abuff->len + 1);
+    strcat(abuff->buf, str);
+  }
+  
+  
+}
+
+void free_abuff(struct append_buffer* abuff) {
+  free(abuff->buf);
+}
+
+
+// ---- Terminal ----
+typedef struct {
+  struct termios orig_termios;
+  struct winsize win;
+  int cols;
+  int rows;
+} term_config;
+
+term_config g_term_config;
+
+void init_term() {
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &g_term_config.win) == -1){
+    perror("ioctl");
+    exit(1);
+  }
+  g_term_config.rows = g_term_config.win.ws_row;
+  g_term_config.cols = g_term_config.win.ws_col;
+  // printf("width: %d\n", g_term_config.win.ws_col);
+  // fflush(stdout);
 }
 
 void enable_raw_mode() {
+  // clear();
   
-  struct termios raw;
-  // uint8_t a;
+  struct termios raw_termios;
 
-  if (tcgetattr(STDIN_FILENO, &prev_termios) == -1)
-    die("tcgetattr");
-  raw = prev_termios;
-  raw.c_iflag &= ~(IXON);
-  raw.c_lflag &= ~(ECHO | ICANON | ISIG);
-  // raw.c_cc[VMIN] = 0;
-  // raw.c_cc[VTIME] = 20;
-
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
-
-  atexit(disable_raw_mode);
+  tcgetattr(STDIN_FILENO, &g_term_config.orig_termios);
+  raw_termios = g_term_config.orig_termios;
+  raw_termios.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw_termios);
 }
 
-char to_ctrl(char c) {
-  return c & 0x1f;
+void revert_canon() {
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &g_term_config.orig_termios);
 }
 
-char editor_read_key() {
-  int nread;
-  char c;
-  while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
-    if (nread == -1) die("read");
+void clear() {
+  write(STDOUT_FILENO, "\x1b[H", 3);
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+}
+
+void handle_input() {
+  char ch;
+  if (read(STDIN_FILENO, &ch, 1) == 1){
+    switch (ch){
+      case 'Q':
+        printf("Exiting...\n");
+        exit(0);
+      // case 'a':
+      //   print_buffer();
+    }
   }
-  return c;
+  append_to_buffer(&g_append_buffer, (char[]){ch, '\0'});
+
 }
-/*** input ***/
-void editor_process_keypress() {
-  char c = editor_read_key();
-  switch (c) {
-      case CTRL_KEY('q'):
-    // case to_ctrl('q'):
-      exit(0);
-      break;
-  }
+
+void draw() {
+  
+  write(STDOUT_FILENO, "\x1b[H", 3);
+  write(STDOUT_FILENO, g_append_buffer.buf, g_append_buffer.len);
+}
+
+// TODO
+void print_bar() {
+  write(STDOUT_FILENO, "\x1b[10H", 6);
+  write(STDOUT_FILENO, "--------------", 14);
+  // fflush(stdout);
 }
 
 int main() {
-  // printf("\x1b[2J");
+  init_term();
+  init_buffer(&g_append_buffer);
+  // client
   enable_raw_mode();
-  
   while (1) {
-    editor_process_keypress();
+    handle_input();
+    clear();
+    draw();
+    print_bar();
   }
+  // get terminal size
+  atexit(revert_canon);
+  
+
 
   return 0;
 }
