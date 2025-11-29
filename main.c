@@ -1,3 +1,4 @@
+#include <netinet/in.h>
 #include <signal.h>
 #include <stdio.h>
 #include <strings.h>
@@ -10,6 +11,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 
 #define KEY_ENTER     10
 #define KEY_BACKSPACE 127
@@ -23,6 +25,7 @@ typedef struct {
   char buf[100];
   struct addrinfo hints;
   struct addrinfo* res;
+  struct sockaddr_in* servaddr;
 
 } net_info;
 
@@ -109,8 +112,8 @@ void enable_raw_mode() {
 
   tcgetattr(STDIN_FILENO, &g_term_config.orig_termios);
   raw_termios = g_term_config.orig_termios;
-  raw_termios.c_lflag &= ~(ICANON | ECHO | ISIG);
-  raw_termios.c_iflag &= ~(IXON | IXOFF);
+  raw_termios.c_lflag &= ~(ICANON | ECHO | ISIG); // Disable read batching, echoing and C-c
+  raw_termios.c_iflag &= ~(IXON | IXOFF); // Disable C-a C-q
 
   raw_termios.c_cc[VMIN] = 0;
   raw_termios.c_cc[VTIME] = 0;
@@ -140,6 +143,8 @@ void handle_input() {
 
         bzero(g_term_config.input, g_term_config.len);
         g_term_config.len = 0;
+
+        write(net.sockfd, g_append_buffer.buf, g_append_buffer.len);
         break;
         // term_cfg         
       case KEY_BACKSPACE:
@@ -188,7 +193,7 @@ void cleanup() {
 
 int main(int argc, char** argv) {
   if (argc != 3) {
-    perror("Usage: <hostname> <port>\n");
+    perror("Usage: <hostname> <port>");
     exit(1);
   }
   
@@ -198,10 +203,27 @@ int main(int argc, char** argv) {
 
   bzero(&net.hints, sizeof(net.hints));
   net.hints.ai_family = AF_INET;
+  // net.hints.ai_family = AF_UNSPEC;
   net.hints.ai_socktype = SOCK_STREAM;
-  
-  if (getaddrinfo(argv[1], NULL, &net.hints, &net.res) == -1) {
+  // TODO: understand linked lists  
+  if (getaddrinfo(argv[1], argv[2], &net.hints, &net.res) == -1) {
     perror("getaddrinfo");
+    exit(1);
+  }
+
+  struct addrinfo* temp = net.res;
+  while (temp != NULL) {
+    char str[INET6_ADDRSTRLEN];
+    if (temp->ai_addr->sa_family == AF_INET) {
+      net.servaddr = (struct sockaddr_in *)temp->ai_addr;
+      // printf("%s\n", inet_ntop(AF_INET, &p->sin_addr, str, sizeof(str)));
+      // printf("port: %d\n", ntohs(p->sin_port));
+    }
+
+    temp = temp->ai_next;
+  }
+  if (connect(net.sockfd, net.res->ai_addr, net.res->ai_addrlen) == -1) {
+    perror("connect");
     exit(1);
   }
   // client
