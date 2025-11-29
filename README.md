@@ -14,7 +14,7 @@ TCP chat client, similar to telnet. This project was built for learning purposes
 -  System with POSIX API
 
 ## Quick Start
-Use localhost for <server-addr> if you're testing this on local machine
+Use localhost for "server-addr" if you're testing this on local machine
 ```console
 gcc ./server -o server server.c
 gcc ./main -o main main.c
