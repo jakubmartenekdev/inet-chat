@@ -6,6 +6,7 @@ TCP chat client, similar to telnet. This project was built for learning purposes
 
 - [Requirements](#requirements)
 - [Installation](#quick-start)
+- [Features](#features)
 - [Changelog](#changelog)
 
 ## Requirements
@@ -22,6 +23,14 @@ gcc ./main -o main main.c
 ./server <port>
 ./main <server-addr> <port>
 ```
+### Features
+- [x] Tcp client with simple TUI
+- [x] Tcp server
+- [ ] Tcp server that broadcasts messages
+- [x] IPv4 support
+- [ ] IPv6 support
+- [ ] UNIX sockets support
+
 
 ## Changelog
 
