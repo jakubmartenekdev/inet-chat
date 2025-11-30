@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <netinet/in.h>
 #include <signal.h>
 #include <stdio.h>
@@ -12,6 +13,7 @@
 #include <string.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 #define KEY_ENTER     10
 #define KEY_BACKSPACE 127
@@ -141,10 +143,10 @@ void handle_input() {
         append_to_buffer(&g_append_buffer, g_term_config.input);
         append_to_buffer(&g_append_buffer, "\n");
 
+        write(net.sockfd, g_term_config.input, g_term_config.len);
+
         bzero(g_term_config.input, g_term_config.len);
         g_term_config.len = 0;
-
-        write(net.sockfd, g_append_buffer.buf, g_append_buffer.len);
         break;
         // term_cfg         
       case KEY_BACKSPACE:
@@ -191,6 +193,24 @@ void cleanup() {
 
 }
 
+void recv_serv_msg() {
+  char buffer[100];
+  int n;
+  
+  n = read(net.sockfd, buffer, sizeof(buffer));
+  if (n > 0) {
+    buffer[n] = '\0';
+    append_to_buffer(&g_append_buffer, buffer);
+  } else if (n == -1) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        return;
+    }
+    perror("Reading from server failed");
+    exit(1);
+  }  
+
+}
+
 int main(int argc, char** argv) {
   if (argc != 3) {
     perror("Usage: <hostname> <port>");
@@ -226,9 +246,15 @@ int main(int argc, char** argv) {
     perror("connect");
     exit(1);
   }
+  
+  // TODO: study more use cases of fcntl
+  int flags = fcntl(net.sockfd, F_GETFL, 0);
+  fcntl(net.sockfd, F_SETFL, flags | O_NONBLOCK);
   // client
   enable_raw_mode();
   while (1) {
+    // TODO: do not receive message if am the sender
+    recv_serv_msg();
     handle_input();
     clear();
     draw();
