@@ -26,6 +26,7 @@ gcc ./main -o main main.c
 ### Features
 - [x] Tcp client with simple TUI
 - [x] Tcp server that broadcasts messages
+- [ ] Semaphore queue
 - [x] IPv4 support
 - [ ] IPv6 support
 - [ ] UNIX sockets support
@@ -34,6 +35,16 @@ gcc ./main -o main main.c
 
 
 ## Changelog
+
+## Changelog
+
+### [1.1.0] - 2025 Sun Dec 7
+
+#### Added
+- Temporary sync.c for testing
+
+#### To fix
+- Implement a queue using semaphores to ensure that server won't run out of resources
 
 ### [1.1.0] - 2025 Sun Nov 30
 
