@@ -51,8 +51,8 @@ gcc ./main -o main main.c
 
 #### Added
 - Initial release
-- Core functionality
 - Socket API
+- Hostname to address translation
 
 #### Changed
 - N/A

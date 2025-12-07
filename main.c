@@ -54,7 +54,7 @@ void init_buffer(struct append_buffer* abuff) {
 void append_to_buffer(struct append_buffer* abuff, char* str) {
   // TODO double realloc space and shrink buffer 
   if (abuff->buf == NULL) {
-    abuff->buf = malloc(strlen(str) + 1);
+    abuff->buf = malloc(strlen(str) * 2 + 1);
     if (abuff->buf == NULL) {
       perror("Allocating space failure");
       exit(1);
