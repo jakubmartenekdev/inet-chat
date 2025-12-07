@@ -38,9 +38,10 @@ gcc ./main -o main main.c
 
 ## Changelog
 
-### [1.1.0] - 2025 Sun Dec 7
+### [1.2.0] - 2025 Sun Dec 7
 
 #### Added
+- Makefile
 - Temporary sync.c for testing
 
 #### To fix
