@@ -8,14 +8,18 @@
 
 
 sem_t semaphore;
+pthread_mutex_t mutex;
+// pthread_mutex_t mutex;
 
 void* routine(void* args) {
-  sem_wait(&semaphore);
+  //sem_wait(&semaphore);
+  pthread_mutex_lock(&mutex);
   // critical section
   sleep(1);
   printf("Hello from routine\n");
   // end of critical section
-  sem_post(&semaphore);
+  //sem_post(&semaphore);
+  pthread_mutex_unlock(&mutex);
 }
 
 int main() {

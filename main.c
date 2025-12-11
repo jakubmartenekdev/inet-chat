@@ -178,7 +178,7 @@ void print_bar() {
     memcpy(line + i * 3, "─", 3); // pointer arithmetic
   }
   memcpy(line + i * 3, "\0", 1);
-  
+
   write(STDOUT_FILENO, line, strlen(line)); // get number of bytes before \0
   
   snprintf(escape_seq, sizeof(escape_seq), "\x1b[%dH", g_term_config.rows - 1);

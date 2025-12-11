@@ -22,7 +22,6 @@ void error(char *msg)
 void broadcast_msg(int sig) {
   char buffer[100];
   int n;
-
   if ((n = read(pipefd[0], buffer, sizeof(buffer))) == -1)
     error("reading from pipe");
 

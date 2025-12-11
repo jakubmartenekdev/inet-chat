@@ -1,5 +1,5 @@
 CC=gcc
-TARGETS=main server sync
+TARGETS=main server sync stack queue
 
 .PHONY: all clean
 
@@ -13,6 +13,12 @@ server: server.c
 
 sync: sync.c
 	$(CC) -pthread -o $@ $^
+
+stack: stack.c
+	$(CC) -o $@ $^
+
+queue: queue.c
+	$(CC) -o $@ $^
 
 clean:
 	rm -rf $(TARGETS)
