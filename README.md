@@ -30,13 +30,19 @@ gcc ./main -o main main.c
 - [x] IPv4 support
 - [ ] IPv6 support
 - [ ] UNIX sockets support
-- [ ] Makefile
+- [x] Makefile
 - [x] Many memory leaks
 
 
 ## Changelog
 
-## Changelog
+### [1.2.1] - 2025 Fri Dec 12
+
+#### Changed
+- Append buffer now stores an initial capacity, making it more effective by doubling the size when full and limits calls to realloc
+
+#### To fix
+- [ ] Apparently there's a bug, when I append too many messages, program crashes
 
 ### [1.2.0] - 2025 Sun Dec 7
 
@@ -45,7 +51,7 @@ gcc ./main -o main main.c
 - Temporary sync.c for testing
 
 #### To fix
-- Implement a queue using semaphores to ensure that server won't run out of resources
+- [ ] Implement a queue using semaphores to ensure that server won't run out of resources
 
 ### [1.1.0] - 2025 Sun Nov 30
 
@@ -56,8 +62,8 @@ gcc ./main -o main main.c
 - Socket reads are now non blocking
 
 #### To fix
-- Client socket should be in shared memory for proper cleanup
-- Let have more than 5 connections per server runtime
+- [ ] Client socket should be in shared memory for proper cleanup
+- [ ] Let have more than 5 connections per server runtime
 
 ### [1.0.0] - 2025 Sat Nov 29
 

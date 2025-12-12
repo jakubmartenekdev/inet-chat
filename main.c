@@ -19,6 +19,8 @@
 #define KEY_BACKSPACE 127
 #define CTRL_KEY(k) ((k) & 0x1F)
 
+#define BUFF_CAPACITY 256
+
 void clear();
 
 // net client
@@ -36,46 +38,37 @@ typedef struct {
 // ---- Append buffer ----
 struct append_buffer {
   char* buf;
-  int len;
+  size_t len;
+  size_t capacity;
 };
 
 struct append_buffer g_append_buffer;
 
 void init_buffer(struct append_buffer* abuff) {
-    abuff->buf = NULL;
+    abuff->buf = malloc(BUFF_CAPACITY * sizeof(*abuff->buf));
     abuff->len = 0;
+    abuff->capacity=BUFF_CAPACITY ; // initial capacity
 }
 
-/**
-* Appends a string to a dynamic string buffer
-* @param abuff append buffer
-* @param str newly appended string
-*/
 void append_to_buffer(struct append_buffer* abuff, char* str) {
-  // TODO double realloc space and shrink buffer 
-  if (abuff->buf == NULL) {
-    abuff->buf = malloc(strlen(str) * 2 + 1);
-    if (abuff->buf == NULL) {
-      perror("Allocating space failure");
-      exit(1);
+    if (strlen(str) > BUFF_CAPACITY) {
+        perror("Appended buffer is too large, skipping");
+        return;
+    } // TODO: fix
+    size_t new_len = abuff->len + strlen(str) + 1;
+    if (new_len > abuff->capacity) {
+        abuff->capacity *= 2;
+        // same as sizeof(char) but more generic if I wish to extend this behaviour in the future
+        abuff->buf = realloc(abuff->buf, abuff->capacity * sizeof(*abuff->buf)); 
     }
-    abuff->len = strlen(str);
 
-    strcpy(abuff->buf, str);
-  }
-  else {
-    abuff->len += strlen(str);
-    abuff->buf = realloc(abuff->buf, abuff->len + 1);
+    abuff->len += sizeof(*abuff->buf) * strlen(str);
     strcat(abuff->buf, str);
-  }
-  
-  
 }
 
 void free_abuff(struct append_buffer* abuff) {
   free(abuff->buf);
 }
-
 
 // ---- Terminal ----
 typedef struct {
