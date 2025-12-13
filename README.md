@@ -19,12 +19,12 @@ TCP chat client, similar to telnet. This project was built for learning purposes
 Use localhost for "server-addr" if you're testing this on local machine
 ```console
 gcc ./server -o server server.
-gcc ./main -o main main.c
+gcc ./client -o client client.c
 
 or simply "make all"
 
 ./server <port>
-./main <server-addr> <port>
+./client <server-addr> <port>
 ```
 ### Features
 - [x] Tcp client with simple TUI
