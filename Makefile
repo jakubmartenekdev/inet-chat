@@ -1,11 +1,11 @@
 CC=gcc
-TARGETS=main server sync stack queue
+TARGETS=client server sync stack queue
 
 .PHONY: all clean
 
 all: $(TARGETS)
 
-main: main.c
+client: client.c
 	$(CC) -o $@ $^
 
 server: server.c
@@ -18,6 +18,9 @@ stack: stack.c
 	$(CC) -o $@ $^
 
 queue: queue.c
+	$(CC) -o $@ $^
+
+test: test.c
 	$(CC) -o $@ $^
 
 clean:
