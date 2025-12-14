@@ -51,10 +51,9 @@ or simply "make all"
 
 #### Added
 - Makefile
-- Temporary sync.c for testing
 
 #### To fix
-- [ ] Implement a queue using semaphores to ensure that server won't run out of resources
+- [ ] Implement a thread pool
 
 ### [1.1.0] - 2025 Sun Nov 30
 
