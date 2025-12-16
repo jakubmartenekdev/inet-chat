@@ -1,6 +1,6 @@
 # Inet-chat
 
-TCP chat client, similar to telnet. This project was built for learning purposes.
+TCP chat client, similar to telnet. This project was made for learning purposes.
 
 ## Table of Contents
 
@@ -16,7 +16,8 @@ TCP chat client, similar to telnet. This project was built for learning purposes
 - Makefile (optional)
 
 ## Quick Start
-Use localhost for "server-addr" if you're testing this on local machine
+> [!NOTE]
+> Type "localhost" for \<server-addr\> if you're testing this on a local machine
 ```console
 gcc ./server -o server server.
 gcc ./client -o client client.c
@@ -29,7 +30,7 @@ or simply "make all"
 ### Features
 - [x] Tcp client with simple TUI
 - [x] Tcp server that broadcasts messages
-- [ ] Semaphore queue
+- [ ] Uses threadpool
 - [x] IPv4 support
 - [ ] IPv6 support
 - [ ] UNIX sockets support
