@@ -226,7 +226,7 @@ int main(int argc, char** argv) {
 
   struct addrinfo* temp = net.res;
   while (temp != NULL) {
-    char str[INET6_ADDRSTRLEN];
+    // char str[INET6_ADDRSTRLEN];
     if (temp->ai_addr->sa_family == AF_INET) {
       net.servaddr = (struct sockaddr_in *)temp->ai_addr;
       // printf("%s\n", inet_ntop(AF_INET, &p->sin_addr, str, sizeof(str)));

@@ -1,28 +1,24 @@
 CC=gcc
-TARGETS=client server sync stack queue
+CFLAGS=-Wall
+SRCS=$(wildcard *.c)
+EXCLUDE = ll_queue.c
+FILTERED_SRCS = $(filter-out $(EXCLUDE), $(SRCS))
+TARGET_DIR=bin
+# Make programs for filtered C files
+TARGETS=$(patsubst %.c,$(TARGET_DIR)/%,$(FILTERED_SRCS)) 
 
 .PHONY: all clean
 
 all: $(TARGETS)
 
-client: client.c
-	$(CC) -o $@ $^
+$(TARGET_DIR)/sync: sync.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -pthread -o $@ $<
 
-server: server.c
-	$(CC) -o $@ $^
-
-sync: sync.c
-	$(CC) -pthread -o $@ $^
-
-stack: stack.c
-	$(CC) -o $@ $^
-
-queue: queue.c
-	$(CC) -o $@ $^
-
-test: test.c
-	$(CC) -o $@ $^
+$(TARGET_DIR)/%: %.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	rm -rf $(TARGETS)
+	rm -rf $(TARGET_DIR)
 

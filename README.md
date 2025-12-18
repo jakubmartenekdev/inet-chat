@@ -18,14 +18,14 @@ TCP chat client, similar to telnet. This project was made for learning purposes.
 ## Quick Start
 > [!NOTE]
 > Type "localhost" for \<server-addr\> if you're testing this on a local machine
+> [!NOTE]
+> Use make command or compile from source
+
 ```console
-gcc ./server -o server server.
-gcc ./client -o client client.c
+make all
 
-or simply "make all"
-
-./server <port>
-./client <server-addr> <port>
+./bin/server <port>
+./bin/client <server-addr> <port>
 ```
 ### Features
 - [x] Tcp client with simple TUI
@@ -35,10 +35,17 @@ or simply "make all"
 - [ ] IPv6 support
 - [ ] UNIX sockets support
 - [x] Makefile
+- [ ] Included testing framework
 - [x] Many memory leaks
 
 
 ## Changelog
+
+### [1.2.2] - 2025 Thu Dec 18
+
+#### Changed
+- Refactored Makefile, made use of built in functions like wildcard, patsubst and filter-out
+- Changed project structure, including added sub-directories for binaries
 
 ### [1.2.1] - 2025 Fri Dec 12
 
