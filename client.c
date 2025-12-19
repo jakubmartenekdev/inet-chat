@@ -1,3 +1,5 @@
+#include "client.h"
+
 #include <errno.h>
 #include <netinet/in.h>
 #include <signal.h>
@@ -7,7 +9,6 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
-#include <stdio.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <string.h>
@@ -15,34 +16,14 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-#define KEY_ENTER     10
-#define KEY_BACKSPACE 127
-#define CTRL_KEY(k) ((k) & 0x1F)
-
-#define BUFF_CAPACITY 256
-
-void clear();
-
-// net client
-typedef struct {
-  int sockfd;
-  char buf[100];
-  struct addrinfo hints;
-  struct addrinfo* res;
-  struct sockaddr_in* servaddr;
-
-} net_info;
-
-  net_info net;
-
-// ---- Append buffer ----
-struct append_buffer {
-  char* buf;
-  size_t len;
-  size_t capacity;
-};
-
+net_info net;
 struct append_buffer g_append_buffer;
+term_config g_term_config;
+
+void clear() {
+  write(STDOUT_FILENO, "\x1b[H", 3);
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+}
 
 void init_buffer(struct append_buffer* abuff) {
     abuff->buf = malloc(BUFF_CAPACITY * sizeof(*abuff->buf));
@@ -69,18 +50,6 @@ void append_to_buffer(struct append_buffer* abuff, char* str) {
 void free_abuff(struct append_buffer* abuff) {
   free(abuff->buf);
 }
-
-// ---- Terminal ----
-typedef struct {
-  struct termios orig_termios;
-  struct winsize win;
-  char input[100];
-  int len;
-  int cols;
-  int rows;
-} term_config;
-
-term_config g_term_config;
 
 void window_resize(int sig) {
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &g_term_config.win);
@@ -117,11 +86,6 @@ void enable_raw_mode() {
 
 void revert_canon() {
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &g_term_config.orig_termios);
-}
-
-void clear() {
-  write(STDOUT_FILENO, "\x1b[H", 3);
-  write(STDOUT_FILENO, "\x1b[2J", 4);
 }
 
 void handle_input() {

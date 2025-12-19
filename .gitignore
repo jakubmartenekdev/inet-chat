@@ -1,1 +1,8 @@
-compile_commands.js
+# Build directories
+build/
+bin/
+obj/
+
+.cache/
+
+compile_commands.json

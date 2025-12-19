@@ -3,10 +3,21 @@
 
 #include <stdbool.h>
 
-typedef struct node node;
+// typedef struct node node;
+//
+// typedef struct ll_queue ll_queue;
 
-typedef struct ll_queue ll_queue;
+typedef struct node {
+    int value;
+    struct node* next;
+} node;
 
+typedef struct ll_queue {
+    node* head;
+    node* rear;
+} ll_queue;
+
+// TODO: ll_queue* queue_create(void);
 void make_empty(ll_queue* queue);
 
 bool is_empty(ll_queue* queue);

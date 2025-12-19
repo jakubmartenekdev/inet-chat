@@ -1,18 +1,10 @@
 // O(1) implementation of queue linked list
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct node {
-    int value;
-    struct node* next;
-} node;
+#include "ll_queue.h"
 
-typedef struct ll_queue {
-    node* head;
-    node* rear;
-} ll_queue;
 
 void make_empty(ll_queue* queue) {
     queue->head = NULL;

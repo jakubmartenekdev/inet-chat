@@ -18,9 +18,6 @@ TCP chat client, similar to telnet. This project was made for learning purposes.
 ## Quick Start
 > [!NOTE]
 > Type "localhost" for \<server-addr\> if you're testing this on a local machine
-> [!NOTE]
-> Use make command or compile from source
-
 ```console
 make all
 
@@ -35,7 +32,7 @@ make all
 - [ ] IPv6 support
 - [ ] UNIX sockets support
 - [x] Makefile
-- [ ] Included testing framework
+- [ ] Includes testing framework
 - [x] Many memory leaks
 
 
