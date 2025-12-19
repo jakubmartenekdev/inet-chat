@@ -24,6 +24,7 @@ make all
 ./bin/server <port>
 ./bin/client <server-addr> <port>
 ```
+
 ### Features
 - [x] Tcp client with simple TUI
 - [x] Tcp server that broadcasts messages
@@ -32,11 +33,20 @@ make all
 - [ ] IPv6 support
 - [ ] UNIX sockets support
 - [x] Makefile
-- [ ] Includes testing framework
+- [x] Criterion - testing framework
+- [x] Unit tests
+- [ ] Integrated tests
 - [x] Many memory leaks
 
 
 ## Changelog
+
+### [1.3.2] - 2025 Thu Dec 18
+
+#### Added
+- Even more Makefile shenenigans 
+- Criterion testing framework, controlled with Makefile
+- Common header files for ll_queue.c and client.c
 
 ### [1.2.2] - 2025 Thu Dec 18
 
