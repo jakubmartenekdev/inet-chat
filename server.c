@@ -18,12 +18,17 @@ typedef struct task {
     int clisockfd_idx;
 } task;
 
+typedef struct message {
+    char buffer[BUFSIZE];
+    int clisockfd_idx;
+} message;
+
 int clisockfd[NCONN];
 int pipefd[2];
 
 pthread_mutex_t queue_mutex;
 pthread_cond_t queue_cond;
-task* tasks[NCONN];
+task* tasks[NCONN]; // queue of tasks
 int head_idx;
 
 void enqueue_task(task* task) {
@@ -53,8 +58,10 @@ void* spawn_worker(void* args) {
 }
 
 void handle_connection(int clisockfd_idx) {
-    int bytes_read;
     char buffer[BUFSIZE];
+    message msg;
+    // bzero(&msg, sizeof(msg));
+    int bytes_read;
     while (1) {
         bzero(buffer,BUFSIZE);
         bytes_read = read(clisockfd[clisockfd_idx],buffer,BUFSIZE-1);
@@ -68,7 +75,10 @@ void handle_connection(int clisockfd_idx) {
             break;
         }
         printf("[SERVER] received message: %s\n",buffer);
-        write(pipefd[1], buffer, strlen(buffer));
+        buffer[bytes_read] = '\0';
+        strcpy(msg.buffer, buffer);
+        msg.clisockfd_idx = clisockfd_idx;
+        write(pipefd[1], &msg, sizeof(msg));
         kill(getpid(), SIGUSR1);
     }
     close(clisockfd[clisockfd_idx]);
@@ -82,16 +92,15 @@ void error(char *msg)
 }
 
 void broadcast_msg(int sig) {
-    char buffer[BUFSIZE];
+    message msg;
     int n;
-    if ((n = read(pipefd[0], buffer, sizeof(buffer))) == -1)
+    if ((n = read(pipefd[0], &msg, sizeof(msg))) == -1)
         error("reading from pipe");
 
-    buffer[n] = '\0'; // null terminate raw bytes
     for (int i = 0; i < NCONN; i++) {
-        if (clisockfd[i] != 0) {
+        if (clisockfd[i] != 0 && clisockfd[i] != clisockfd[msg.clisockfd_idx]) {
             printf("[BROADCAST] Attempting to write to client %d (fd=%d)\n", i, clisockfd[i]);
-            int res = write(clisockfd[i], buffer, sizeof(buffer));
+            int res = write(clisockfd[i], &msg.buffer, sizeof(msg.buffer));
             if (res == -1) error("writing to socket failed");
             printf("[SERVER] sent broadcast message...\n");
         }

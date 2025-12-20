@@ -20,6 +20,8 @@ void* routine(void* args) {
   // end of critical section
   //sem_post(&semaphore);
   pthread_mutex_unlock(&mutex);
+
+  return NULL;
 }
 
 int main() {
