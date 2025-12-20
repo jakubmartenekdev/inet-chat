@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,100 +8,158 @@
 #include <unistd.h>
 #include <sys/signal.h>
 
-#define NCONN 5
+#define NCONN 100
+#define BUFSIZE 256
 
-// TODO: shared memory
+#define N_THREADS 4
+
+typedef struct task {
+    void (*execute) (int arg); 
+    int clisockfd_idx;
+} task;
+
 int clisockfd[NCONN];
 int pipefd[2];
 
-void error(char *msg)
-{
-  perror(msg);
-  exit(EXIT_FAILURE);
+pthread_mutex_t queue_mutex;
+pthread_cond_t queue_cond;
+task* tasks[NCONN];
+int head_idx;
+
+void enqueue_task(task* task) {
+    pthread_mutex_lock(&queue_mutex);
+    tasks[head_idx] = task;
+    head_idx++;
+    pthread_mutex_unlock(&queue_mutex);
+    pthread_cond_signal(&queue_cond);
 }
 
-void broadcast_msg(int sig) {
-  char buffer[100];
-  int n;
-  if ((n = read(pipefd[0], buffer, sizeof(buffer))) == -1)
-    error("reading from pipe");
-
-  buffer[n] = '\0'; // null terminate raw bytes
-  for (int i = 0; i < NCONN; i++) {
-    if (clisockfd[i] != 0) {
-      printf("[BROADCAST] Attempting to write to client %d (fd=%d)\n", i, clisockfd[i]);
-      int res = write(clisockfd[i], buffer, sizeof(buffer));
-      if (res == -1) error("writing to socket failed");
-      printf("[SERVER] sent broadcast message...\n");
+void* spawn_worker(void* args) {
+    task* task;
+    while (1) {
+        printf("About to lock in\n");
+        pthread_mutex_lock(&queue_mutex);
+        while (head_idx == 0) {
+            pthread_cond_wait(&queue_cond, &queue_mutex);
+        }
+        printf("Awaken from dark slumber\n");
+        task = tasks[0];
+        for (int i = 0; i < head_idx - 1; i++)
+            tasks[i] = tasks[i + 1];
+        head_idx--;
+        pthread_mutex_unlock(&queue_mutex);
+        task->execute(task->clisockfd_idx);
     }
-  }  
 }
 
-int main(int argc, char *argv[]) {
-  int sockfd, tempsockfd, portno, clilen, n;
-  char buffer[256];
-  struct sockaddr_in serv_addr;
-  struct sockaddr_in cli_addr;
-  if (argc < 2) {
-    fprintf(stderr,"ERROR, no port provided\n");
-    exit(1);
-  }
-
-  if (pipe(pipefd) == -1) {
-    error("creating pipe failed");
-  }
-  signal(SIGUSR1, broadcast_msg);
-  sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) error("ERROR opening socket");
-  bzero(&serv_addr, sizeof(serv_addr));
-  portno = atoi(argv[1]);
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_addr.s_addr = INADDR_ANY;
-  serv_addr.sin_port = htons(portno);
-
-  if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-    error("ERROR on binding");
-  listen(sockfd, NCONN);
-  clilen = sizeof(cli_addr);
-
-  while (1) {
-    
-    tempsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
-    printf("client connected\n");
-    if (tempsockfd < 0) error("ERROR on accept");
-    int i;
-    // TODO: handle cleanup properly
-    for (i = 0; i < 5; i++) {
-      if (clisockfd[i] == 0) {
-        clisockfd[i] = tempsockfd;
-        break;
-      }
-    }
-    
-    if (fork() == 0) {
-      close(sockfd);
-      close(pipefd[0]);
-      while (1) {
-        bzero(buffer,256);
-        n = read(clisockfd[i],buffer,255);
-        if (n <= 0) {
-          if (n == 0) {
-              printf("Client disconnected (EOF)\n");
-              exit(EXIT_SUCCESS);
-          }
-          else {
-              printf("Read error\n");
-          }
+void handle_connection(int clisockfd_idx) {
+    int bytes_read;
+    char buffer[BUFSIZE];
+    while (1) {
+        bzero(buffer,BUFSIZE);
+        bytes_read = read(clisockfd[clisockfd_idx],buffer,BUFSIZE-1);
+        if (bytes_read <= 0) {
+            if (bytes_read == 0) {
+                printf("Client disconnected (EOF)\n");
+            }
+            else {
+                printf("Read error\n");
+            }
+            break;
         }
         printf("[SERVER] received message: %s\n",buffer);
         write(pipefd[1], buffer, strlen(buffer));
-        kill(getppid(), SIGUSR1);
-      }
-      close(pipefd[1]);
-      close(tempsockfd);
-      clisockfd[i] = 0;
-      exit(0);
+        kill(getpid(), SIGUSR1);
     }
-  }
-  return EXIT_SUCCESS;
+    close(clisockfd[clisockfd_idx]);
+    clisockfd[clisockfd_idx] = 0;
+}
+
+void error(char *msg)
+{
+    perror(msg);
+    exit(EXIT_FAILURE);
+}
+
+void broadcast_msg(int sig) {
+    char buffer[BUFSIZE];
+    int n;
+    if ((n = read(pipefd[0], buffer, sizeof(buffer))) == -1)
+        error("reading from pipe");
+
+    buffer[n] = '\0'; // null terminate raw bytes
+    for (int i = 0; i < NCONN; i++) {
+        if (clisockfd[i] != 0) {
+            printf("[BROADCAST] Attempting to write to client %d (fd=%d)\n", i, clisockfd[i]);
+            int res = write(clisockfd[i], buffer, sizeof(buffer));
+            if (res == -1) error("writing to socket failed");
+            printf("[SERVER] sent broadcast message...\n");
+        }
+    }  
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        fprintf(stderr,"ERROR, no port provided\n");
+        exit(1);
+    }
+
+    int sockfd, tempsockfd, portno;
+    socklen_t clilen;
+    struct sockaddr_in serv_addr;
+    struct sockaddr_in cli_addr;
+
+    pthread_mutex_init(&queue_mutex, NULL);
+    pthread_cond_init(&queue_cond, NULL);
+    pthread_t threads[N_THREADS];
+
+    for (int i = 0; i < N_THREADS; i++) {
+        pthread_create(&threads[i], NULL, spawn_worker, NULL);
+    }
+
+    if (pipe(pipefd) == -1) {
+        error("creating pipe failed");
+    }
+    signal(SIGUSR1, broadcast_msg);
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) error("ERROR opening socket");
+    bzero(&serv_addr, sizeof(serv_addr));
+    portno = atoi(argv[1]);
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_port = htons(portno);
+
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+        error("ERROR on binding");
+    listen(sockfd, NCONN);
+    clilen = sizeof(cli_addr);
+
+    while (1) {
+
+        tempsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
+
+        printf("client connected\n");
+        if (tempsockfd < 0) error("ERROR on accept");
+        int i;
+        for (i = 0; i < NCONN; i++) {
+            if (clisockfd[i] == 0) {
+                clisockfd[i] = tempsockfd;
+                break;
+            }
+        }
+        task t = {
+            .execute = handle_connection,
+            .clisockfd_idx = i
+        };
+        enqueue_task(&t);
+    }
+
+    for (int i = 0; i < N_THREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    pthread_mutex_destroy(&queue_mutex);
+    pthread_cond_destroy(&queue_cond);
+
+    return EXIT_SUCCESS;
 }

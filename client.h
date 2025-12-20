@@ -10,6 +10,7 @@
 #define CTRL_KEY(k) ((k) & 0x1F)
 
 #define BUFF_CAPACITY 256
+#define BUFSIZE 256
 
 struct append_buffer {
     char* buf;
@@ -34,10 +35,6 @@ typedef struct {
     int rows;
 } term_config;
 
-extern net_info net;
-extern struct append_buffer g_append_buffer;
-extern term_config g_term_config;
-
 void clear(void);
 void init_buffer(struct append_buffer* abuff);
 void append_to_buffer(struct append_buffer* abuff, char* str);
@@ -51,6 +48,5 @@ void draw(void);
 void print_bar(void);
 void cleanup(void);
 void recv_serv_msg(void);
-int main(int argc, char** argv);
 
 #endif

@@ -50,6 +50,21 @@ int dequeue(ll_queue* queue) {
     return result;
 }
 
+void free_queue(ll_queue* queue) {
+    if (has_single_element(queue)) {
+        free(queue->head);
+        free(queue);
+        return;
+    }
+    while (queue->head->next != NULL) {
+        node* tmp = queue->head;
+        queue->head = queue->head->next;
+        free(tmp);
+    }
+    free(queue->head);
+    free(queue);
+}
+
 // TODO: free linked list
 
 // int main() {

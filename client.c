@@ -151,7 +151,7 @@ void cleanup() {
 }
 
 void recv_serv_msg() {
-  char buffer[100];
+  char buffer[BUFSIZE];
   int n;
   
   n = read(net.sockfd, buffer, sizeof(buffer));

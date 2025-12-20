@@ -28,4 +28,6 @@ void enqueue(ll_queue* queue, int value);
 
 int dequeue(ll_queue* queue);
 
+void free_queue(ll_queue* queue);
+
 #endif // QUEUE_H

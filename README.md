@@ -19,16 +19,16 @@ TCP chat client, similar to telnet. This project was made for learning purposes.
 > [!NOTE]
 > Type "localhost" for \<server-addr\> if you're testing this on a local machine
 ```console
-make all
+make all DEBUG=0
 
-./bin/server <port>
-./bin/client <server-addr> <port>
+./build/release/bin/server <port>
+./build/release/bin/client <server-addr> <port>
 ```
 
 ### Features
 - [x] Tcp client with simple TUI
 - [x] Tcp server that broadcasts messages
-- [ ] Uses threadpool
+- [x] Uses threadpool
 - [x] IPv4 support
 - [ ] IPv6 support
 - [ ] UNIX sockets support
@@ -41,10 +41,15 @@ make all
 
 ## Changelog
 
-### [1.3.2] - 2025 Thu Dec 18
+### [1.3.3] - 2025 Sat Dec 20
+
+#### Changed
+- Server uses thread pool instead of processes to handle client requests
+- Server is capable to handle hundreds of connections
+
+### [1.3.2] - 2025 Fri Dec 19
 
 #### Added
-- Even more Makefile shenenigans 
 - Criterion testing framework, controlled with Makefile
 - Common header files for ll_queue.c and client.c
 
@@ -60,7 +65,7 @@ make all
 - Append buffer now stores an initial capacity, making it more effective by doubling the size when full and limits calls to realloc
 
 #### To fix
-- [ ] Apparently there's a bug, when I append too many messages, program crashes
+- [x] Apparently there's a bug, when I append too many messages, program crashes
 
 ### [1.2.0] - 2025 Sun Dec 7
 
@@ -68,7 +73,7 @@ make all
 - Makefile
 
 #### To fix
-- [ ] Implement a thread pool
+- [x] Implement a thread pool
 
 ### [1.1.0] - 2025 Sun Nov 30
 
@@ -79,8 +84,8 @@ make all
 - Socket reads are now non blocking
 
 #### To fix
-- [ ] Client socket should be in shared memory for proper cleanup
-- [ ] Let have more than 5 connections per server runtime
+- ~~[ ] Client socket should be in shared memory for proper cleanup~~
+- [x] Let have more than 5 connections per server runtime
 
 ### [1.0.0] - 2025 Sat Nov 29
 
