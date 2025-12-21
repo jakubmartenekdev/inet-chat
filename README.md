@@ -1,8 +1,8 @@
 # Inet-chat
 A real-time TCP chat application
 
->[!WARN]
-> This is a toy project I made to learn core systems programming concepts in C and such, is only intended to use for learning purposes only
+>[!WARNING]
+> This is a toy project I made to learn core systems programming concepts in C and such, is only intended to use for learning and integration test purposes
 
 ## Table of Contents
 
@@ -20,11 +20,14 @@ A real-time TCP chat application
 ## Quick Start
 > [!NOTE]
 > Type "localhost" for \<server-addr\> if you're testing this on a local machine
-```console
+```
+git clone https://github.com/jakubmartenekdev/inet-chat.git
+cd inet-chat/
 make all DEBUG=0
+sudo make install DEBUG=0 # Optional
 
-./build/release/bin/server <port>
-./build/release/bin/client <server-addr> <port>
+server <port>
+client <server-addr> <port>
 ```
 
 ### Features
@@ -43,10 +46,13 @@ make all DEBUG=0
 
 ## Changelog
 
-### [1.3.4] - 2025 Sun Dec 21
+### [1.4.3] - 2025 Sun Dec 21
 
 #### Changed
 - Fixed bug where sent text appeard inline because of incorrect use of a new line character 
+
+#### Added
+- make install && make uninstall
 
 #### To fix
 - [ ] Add scroll in the client tui, when the buffer reaches the end of window, scroll automatically

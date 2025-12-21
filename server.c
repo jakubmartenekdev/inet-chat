@@ -11,7 +11,7 @@
 #define NCONN 100
 #define BUFSIZE 256
 
-#define N_THREADS 4
+#define N_THREADS 8
 
 typedef struct task {
     void (*execute) (int arg); 
@@ -42,12 +42,13 @@ void enqueue_task(task* task) {
 void* spawn_worker(void* args) {
     task* task;
     while (1) {
-        printf("About to lock in\n");
+        // TODO: Add debug log  DEBUG
+        // printf("About to lock in\n");
         pthread_mutex_lock(&queue_mutex);
         while (head_idx == 0) {
             pthread_cond_wait(&queue_cond, &queue_mutex);
         }
-        printf("Awaken from dark slumber\n");
+        // printf("Awaken from dark slumber\n");
         task = tasks[0];
         for (int i = 0; i < head_idx - 1; i++)
             tasks[i] = tasks[i + 1];

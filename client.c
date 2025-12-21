@@ -101,6 +101,7 @@ void handle_input() {
         append_to_buffer(&g_append_buffer, "\n");
 
         write(net.sockfd, g_term_config.input, g_term_config.len);
+        // write(net.sockfd, "\n", 1); // TODO: send new line characters over network
 
         bzero(g_term_config.input, g_term_config.len);
         g_term_config.len = 0;

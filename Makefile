@@ -40,7 +40,7 @@ UTEST_LIB=-lcriterion
 UTEST_BIN_DIR = $(UTEST_DIR)/bin
 UTEST_BIN = $(UTEST_BIN_DIR)/tests
 
-.PHONY: all clean tests run
+.PHONY: all clean tests run install
 # Make removes created files that are not targets with names
 # %.o etc. are not names but patters
 # to signal make not to delete my tmp files use .PRECIOUS
@@ -80,6 +80,17 @@ $(UTEST_BIN): $(UTEST_OBJS) $(MODULES_TO_TEST)
 
 run: $(UTEST_BIN)
 	./$(UTEST_BIN)
+
+install:
+	@echo "Installing binaries to /usr/local/bin"
+	cp -i $(TARGET_DIR)/server /usr/local/bin/
+	cp -i $(TARGET_DIR)/client /usr/local/bin/
+	@echo "Successfully installed."
+
+uninstall:
+	@echo "Uninstalling programs..."
+	rm -f /usr/local/bin/server /usr/local/bin/client
+	@echo "Successfully uninstalled."
 
 #-----------------------------------
 # Remove temps
