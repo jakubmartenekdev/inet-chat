@@ -29,7 +29,7 @@ typedef struct {
 typedef struct {
     struct termios orig_termios;
     struct winsize win;
-    char input[100];
+    char input[BUFSIZE];
     int len;
     int cols;
     int rows;

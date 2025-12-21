@@ -164,6 +164,7 @@ int main(int argc, char *argv[]) {
         enqueue_task(&t);
     }
 
+    // TODO: Presunut do atexit() a nastavit key handler
     for (int i = 0; i < N_THREADS; i++) {
         pthread_join(threads[i], NULL);
     }

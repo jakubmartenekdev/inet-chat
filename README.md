@@ -1,6 +1,8 @@
 # Inet-chat
+A real-time TCP chat application
 
-TCP chat client, similar to telnet. This project was made for learning purposes.
+>[!WARN]
+> This is a toy project I made to learn core systems programming concepts in C and such, is only intended to use for learning purposes only
 
 ## Table of Contents
 
@@ -41,6 +43,14 @@ make all DEBUG=0
 
 ## Changelog
 
+### [1.3.4] - 2025 Sun Dec 21
+
+#### Changed
+- Fixed bug where sent text appeard inline because of incorrect use of a new line character 
+
+#### To fix
+- [ ] Add scroll in the client tui, when the buffer reaches the end of window, scroll automatically
+
 ### [1.3.3] - 2025 Sat Dec 20
 
 #### Changed
@@ -62,7 +72,7 @@ make all DEBUG=0
 ### [1.2.1] - 2025 Fri Dec 12
 
 #### Changed
-- Append buffer now stores an initial capacity, making it more effective by doubling the size when full and limits calls to realloc
+- Append buffer now stores an initial capacity, making it more effective by doubling the size when it's full and limits calls to realloc
 
 #### To fix
 - [x] Apparently there's a bug, when I append too many messages, program crashes

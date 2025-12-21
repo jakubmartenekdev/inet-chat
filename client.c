@@ -110,7 +110,7 @@ void handle_input() {
         g_term_config.input[--g_term_config.len] = '\0';
         break;
       default:
-        if (g_term_config.len < 100)
+        if (g_term_config.len < BUFSIZE)
           g_term_config.input[g_term_config.len++] = ch;
     }
   }
@@ -156,8 +156,9 @@ void recv_serv_msg() {
   
   n = read(net.sockfd, buffer, sizeof(buffer));
   if (n > 0) {
-    buffer[n] = '\0';
+    // buffer[n] = '\0';
     append_to_buffer(&g_append_buffer, buffer);
+    append_to_buffer(&g_append_buffer, "\n");
   } else if (n == -1) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
         return;
