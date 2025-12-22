@@ -36,8 +36,8 @@ void append_to_buffer(struct append_buffer* abuff, char* str) {
         perror("Appended buffer is too large, skipping");
         return;
     } // TODO: fix
-    size_t new_len = abuff->len + strlen(str) + 1;
-    if (new_len > abuff->capacity) {
+    size_t new_size = abuff->len + strlen(str) + 1;
+    if (new_size > abuff->capacity) {
         abuff->capacity *= 2;
         // same as sizeof(char) but more generic if I wish to extend this behaviour in the future
         abuff->buf = realloc(abuff->buf, abuff->capacity * sizeof(*abuff->buf)); 
@@ -100,10 +100,11 @@ void handle_input() {
         append_to_buffer(&g_append_buffer, g_term_config.input);
         append_to_buffer(&g_append_buffer, "\n");
 
-        write(net.sockfd, g_term_config.input, g_term_config.len);
-        // write(net.sockfd, "\n", 1); // TODO: send new line characters over network
+        // send new line character over network instead
+        g_term_config.input[g_term_config.len] = '\n'; // TODO: fix on server
+        write(net.sockfd, g_term_config.input, g_term_config.len + 1);
 
-        bzero(g_term_config.input, g_term_config.len);
+        bzero(g_term_config.input, g_term_config.len + 1);
         g_term_config.len = 0;
         break;
         // term_cfg         
@@ -124,7 +125,6 @@ void draw() {
   write(STDOUT_FILENO, g_append_buffer.buf, g_append_buffer.len);
 }
 
-// TODO resize bar with window size
 void print_bar() {
   char escape_seq[16];
   char line[g_term_config.cols * 3 + 1];
@@ -157,7 +157,9 @@ void recv_serv_msg() {
   
   n = read(net.sockfd, buffer, sizeof(buffer));
   if (n > 0) {
-    // buffer[n] = '\0';
+    // append buffer accepts strings, thus we need to null terminate read buff
+    // TODO: receive raw bytes from server
+    buffer[n] = '\0'; 
     append_to_buffer(&g_append_buffer, buffer);
     append_to_buffer(&g_append_buffer, "\n");
   } else if (n == -1) {
@@ -172,7 +174,7 @@ void recv_serv_msg() {
 
 int main(int argc, char** argv) {
   if (argc != 3) {
-    perror("Usage: <hostname> <port>");
+    perror("Usage: <hostname> <port>"); //  TODO: better usage message
     exit(1);
   }
   
@@ -184,7 +186,6 @@ int main(int argc, char** argv) {
   net.hints.ai_family = AF_INET;
   // net.hints.ai_family = AF_UNSPEC;
   net.hints.ai_socktype = SOCK_STREAM;
-  // TODO: understand linked lists  
   if (getaddrinfo(argv[1], argv[2], &net.hints, &net.res) == -1) {
     perror("getaddrinfo");
     exit(1);
@@ -209,17 +210,14 @@ int main(int argc, char** argv) {
   // TODO: study more use cases of fcntl
   int flags = fcntl(net.sockfd, F_GETFL, 0);
   fcntl(net.sockfd, F_SETFL, flags | O_NONBLOCK);
-  // client
   enable_raw_mode();
   while (1) {
-    // TODO: do not receive message if am the sender
     recv_serv_msg();
     handle_input();
     clear();
     draw();
     print_bar();
 
-  // TODO: handle time delay
     usleep(1000000 / 30); // ~30 FPS
   }
   atexit(cleanup);

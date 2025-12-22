@@ -55,7 +55,7 @@ $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TARGET_DIR)/sync: $(OBJ_DIR)/sync.o
+$(TARGET_DIR)/server: $(OBJ_DIR)/server.o
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -pthread -o $@ $<
 
@@ -81,6 +81,9 @@ $(UTEST_BIN): $(UTEST_OBJS) $(MODULES_TO_TEST)
 run: $(UTEST_BIN)
 	./$(UTEST_BIN)
 
+#-----------------------------------
+# Local installation
+#-----------------------------------
 install:
 	@echo "Installing binaries to /usr/local/bin"
 	cp -i $(TARGET_DIR)/server /usr/local/bin/

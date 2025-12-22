@@ -65,7 +65,7 @@ void handle_connection(int clisockfd_idx) {
     int bytes_read;
     while (1) {
         bzero(buffer,BUFSIZE);
-        bytes_read = read(clisockfd[clisockfd_idx],buffer,BUFSIZE-1);
+        bytes_read = read(clisockfd[clisockfd_idx], &buffer, BUFSIZE-1);
         if (bytes_read <= 0) {
             if (bytes_read == 0) {
                 printf("Client disconnected (EOF)\n");
@@ -76,8 +76,8 @@ void handle_connection(int clisockfd_idx) {
             break;
         }
         printf("[SERVER] received message: %s\n",buffer);
-        buffer[bytes_read] = '\0';
-        strcpy(msg.buffer, buffer);
+        buffer[bytes_read - 1] = '\0'; // TODO: delete
+        strcpy(msg.buffer, buffer); // TODO: memcpy
         msg.clisockfd_idx = clisockfd_idx;
         write(pipefd[1], &msg, sizeof(msg));
         kill(getpid(), SIGUSR1);

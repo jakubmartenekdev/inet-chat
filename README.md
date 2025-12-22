@@ -24,7 +24,7 @@ A real-time TCP chat application
 git clone https://github.com/jakubmartenekdev/inet-chat.git
 cd inet-chat/
 make all DEBUG=0
-sudo make install DEBUG=0 # Optional
+sudo make install DEBUG=0 # Optional, avoid typing full path ./build/...
 
 server <port>
 client <server-addr> <port>
@@ -46,6 +46,15 @@ client <server-addr> <port>
 
 ## Changelog
 
+### [1.4.4] - 2025 Mon Dec 22
+
+#### Changed
+- Many network programs send and receive buffers suffixed with newline character and without null terminator, so I fixed the code to satisfy this "convention?", anyway, client has better support with outside software like tcpbin, which I testes and it works fine
+
+#### To fix
+- [ ] More descriptive usage messages
+- [ ] Add metadata to messages
+
 ### [1.4.3] - 2025 Sun Dec 21
 
 #### Changed
@@ -61,7 +70,6 @@ client <server-addr> <port>
 
 #### Changed
 - Server uses thread pool instead of processes to handle client requests
-- Server is capable to handle hundreds of connections
 
 ### [1.3.2] - 2025 Fri Dec 19
 

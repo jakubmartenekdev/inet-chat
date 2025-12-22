@@ -13,7 +13,7 @@
 #define BUFSIZE 256
 
 struct append_buffer {
-    char* buf;
+    char* buf; // null terminated string
     size_t len;
     size_t capacity;
 };
