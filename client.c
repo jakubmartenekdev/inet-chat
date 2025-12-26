@@ -158,10 +158,10 @@ void recv_serv_msg() {
   n = read(net.sockfd, buffer, sizeof(buffer));
   if (n > 0) {
     // append buffer accepts strings, thus we need to null terminate read buff
-    // TODO: receive raw bytes from server
+    // TODO: receive raw bytes from server OR with \n at the end at which point I dont need abuff \n below
     buffer[n] = '\0'; 
     append_to_buffer(&g_append_buffer, buffer);
-    append_to_buffer(&g_append_buffer, "\n");
+    // append_to_buffer(&g_append_buffer, "\n");
   } else if (n == -1) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
         return;
@@ -172,12 +172,22 @@ void recv_serv_msg() {
 
 }
 
+void print_usage(char* prog_name) {
+    printf("Usage:\n"
+            "Syntax is: %s [OPTIONS] <server-addr> <server-portno>\n"
+            "    <server-portno> accepts integer value between 1024-49151\n"
+            "Options are:\n"
+            "    --help: display help message"
+            "\n", prog_name);
+}
+
 int main(int argc, char** argv) {
-  if (argc != 3) {
-    perror("Usage: <hostname> <port>"); //  TODO: better usage message
-    exit(1);
-  }
-  
+    // TODO: check every argument
+    if (argc != 3 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0 )  {
+        print_usage(argv[0]);
+        exit(1);
+    }
+
   init_term();
   init_buffer(&g_append_buffer);
   net.sockfd = socket(AF_INET, SOCK_STREAM, 0);

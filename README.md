@@ -2,7 +2,7 @@
 A real-time TCP chat application
 
 >[!WARNING]
-> This is a toy project I made to learn core systems programming concepts in C and such, is only intended to use for learning and integration test purposes
+> This is a toy project I made to learn core application programming concepts in C and such, is only intended to use for learning and integration test purposes
 
 ## Table of Contents
 
@@ -14,8 +14,8 @@ A real-time TCP chat application
 ## Requirements
 
 - gcc, or any C compiler
--  System with POSIX API
-- Makefile (optional)
+- POSIX-compliant operating systems
+- Makefile (optional but recommended)
 
 ## Quick Start
 > [!NOTE]
@@ -38,6 +38,7 @@ client <server-addr> <port>
 - [ ] IPv6 support
 - [ ] UNIX sockets support
 - [x] Makefile
+- [ ] Build script
 - [x] Criterion - testing framework
 - [x] Unit tests
 - [ ] Integrated tests
@@ -46,13 +47,18 @@ client <server-addr> <port>
 
 ## Changelog
 
+### [1.5.4] - 2025 Fri Dec 26
+
+#### Added
+- Usage messages
+
 ### [1.4.4] - 2025 Mon Dec 22
 
 #### Changed
-- Many network programs send and receive buffers suffixed with newline character and without null terminator, so I fixed the code to satisfy this "convention?", anyway, client has better support with outside software like tcpbin, which I testes and it works fine
+- Many network programs send and receive buffers suffixed with newline character and without null terminator, so I fixed the code to satisfy this "convention?", anyway, client has better support with outside software like tcpbin, which I tested and it works fine
 
 #### To fix
-- [ ] More descriptive usage messages
+- [x] More descriptive usage messages
 - [ ] Add metadata to messages
 
 ### [1.4.3] - 2025 Sun Dec 21
