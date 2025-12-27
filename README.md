@@ -2,7 +2,7 @@
 A real-time TCP chat application
 
 >[!WARNING]
-> This is a toy project I made to learn core application programming concepts in C and such, is only intended to use for learning and integration test purposes
+> This is a toy project I made to learn application programming concepts in C and such, is only intended to use for learning and integration test purposes
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ A real-time TCP chat application
 ## Requirements
 
 - gcc, or any C compiler
-- POSIX-compliant operating systems
+- POSIX-compliant operating system
 - Makefile (optional but recommended)
 
 ## Quick Start
@@ -47,6 +47,11 @@ client <server-addr> <port>
 
 ## Changelog
 
+### [1.6.4] - 2025 Sat Dec 27
+
+### Added
+- Automatic scroll at the end of area buffer
+
 ### [1.5.4] - 2025 Fri Dec 26
 
 #### Added
@@ -55,7 +60,7 @@ client <server-addr> <port>
 ### [1.4.4] - 2025 Mon Dec 22
 
 #### Changed
-- Many network programs send and receive buffers suffixed with newline character and without null terminator, so I fixed the code to satisfy this "convention?", anyway, client has better support with outside software like tcpbin, which I tested and it works fine
+- Many network programs send and receive buffers suffixed with newline character and without null terminator, so I fixed the code to satisfy this "convention?", anyway, client has better support with third party software like tcpbin, which I tested and it works fine
 
 #### To fix
 - [x] More descriptive usage messages
@@ -70,7 +75,7 @@ client <server-addr> <port>
 - make install && make uninstall
 
 #### To fix
-- [ ] Add scroll in the client tui, when the buffer reaches the end of window, scroll automatically
+- [x] Add scroll in the client tui, when the buffer reaches the end of window, scroll automatically
 
 ### [1.3.3] - 2025 Sat Dec 20
 

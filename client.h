@@ -9,11 +9,12 @@
 #define KEY_BACKSPACE 127
 #define CTRL_KEY(k) ((k) & 0x1F)
 
-#define BUFF_CAPACITY 256
+#define BUFF_CAPACITY 32
 #define BUFSIZE 256
 
+// TODO: Vec of strings
 struct append_buffer {
-    char* buf; // null terminated string
+    char** arr;
     size_t len;
     size_t capacity;
 };
