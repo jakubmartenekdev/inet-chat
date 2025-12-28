@@ -103,14 +103,17 @@ void handle_input() {
                 printf("Exiting...\n");
                 exit(0);
             case KEY_ENTER:
+                // input 'h' 'e' 'l' 'l' 'o' '\n' '\0' | '' '' '' ''
                 g_term_config.input[g_term_config.len] = '\n';
                 g_term_config.input[g_term_config.len + 1] = '\0';
-                append_to_buffer(&g_append_buffer, g_term_config.input);
-                // append_to_buffer(&g_append_buffer, "\n");
 
-                // send new line character over network instead
-                // g_term_config.input[g_term_config.len] = '\n'; // TODO: fix on server
-                write(net.sockfd, g_term_config.input, g_term_config.len + 1);
+                memmove(g_term_config.input + strlen(net.username),
+                        g_term_config.input,
+                        strlen(g_term_config.input) + 1);
+                memcpy(g_term_config.input, net.username, strlen(net.username));
+
+                append_to_buffer(&g_append_buffer, g_term_config.input);
+                write(net.sockfd, g_term_config.input, strlen(net.username) + g_term_config.len + 1);
 
                 bzero(g_term_config.input, g_term_config.len + 1);
                 g_term_config.len = 0;
@@ -196,18 +199,32 @@ void recv_serv_msg() {
 
 void print_usage(char* prog_name) {
     printf("Usage:\n"
-            "Syntax is: %s [OPTIONS] <server-addr> <server-portno>\n"
+            "Syntax is: %s <server-addr> <server-portno> [OPTIONS]\n"
             "    <server-portno> accepts integer value between 1024-49151\n"
             "Options are:\n"
-            "    --help: display help message"
-            "\n", prog_name);
+            "    -h (short for --help): show help message\n"
+            "    -n (short for --name): sets up displayed username, up to 10 characters\n", prog_name);
 }
 
 int main(int argc, char** argv) {
-    // TODO: check every argument
-    if (argc != 3 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0 )  {
+    if (argc < 3)  {
         print_usage(argv[0]);
         exit(1);
+    }
+    int name_is_set = 0;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-n") == 0 || strcmp(argv[i], "--name") == 0) {
+            if (i + 1 > argc) break;
+            snprintf(net.username, sizeof(net.username), "[%s] ", argv[i + 1]); 
+            name_is_set = 1;
+        }
+        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+            print_usage(argv[0]);
+            exit(1);
+        }
+    }
+    if (!name_is_set) {
+        strcpy(net.username, "[Anonymous] ");
     }
 
     init_term();

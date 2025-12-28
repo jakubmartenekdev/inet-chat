@@ -36,8 +36,13 @@ cd inet-chat/
 > Type "localhost" for \<server-addr\> if you're testing this on a local machine
 ```
 server <port>
-client <server-addr> <port>
+client <server-addr> <port> [OPTIONS]
 ```
+## Options
+| Option  | Description |
+| ------------- | ------------- |
+| `-h` short for `--help` | display help message |
+| `-n` short for `--name` | set up username to be displayed before the message |
 
 ### Features
 - [x] Tcp client with simple TUI
@@ -60,6 +65,7 @@ client <server-addr> <port>
 
 #### Added
 - Build script to further automate building process
+- User nickname is displayed before the message
 
 ### [1.6.0] - 2025 Sat Dec 27
 
@@ -81,7 +87,7 @@ client <server-addr> <port>
 
 #### To fix
 - [x] More descriptive usage messages
-- [ ] Add metadata to messages
+- [x] Add metadata to messages
 
 ### [1.4.0] - 2025 Sun Dec 21
 
