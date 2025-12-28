@@ -67,6 +67,9 @@ client <server-addr> <port> [OPTIONS]
 - Build script to further automate building process
 - User nickname is displayed before the message
 
+#### To fix
+- [ ] Notify client after the server is shut down
+
 ### [1.6.0] - 2025 Sat Dec 27
 
 #### Added

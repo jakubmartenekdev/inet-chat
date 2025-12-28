@@ -11,7 +11,7 @@
 
 #define BUFF_CAPACITY 32
 #define BUFSIZE 256
-#define USERNAME_SIZE 10
+#define USERNAME_SIZE 14
 
 // TODO: Vec of strings
 struct append_buffer {
@@ -23,7 +23,7 @@ struct append_buffer {
 typedef struct {
     int sockfd;
     char buf[BUFSIZE];
-    char username[USERNAME_SIZE + 2];
+    char username[USERNAME_SIZE];
     struct addrinfo hints;
     struct addrinfo* res;
     struct sockaddr_in* servaddr;

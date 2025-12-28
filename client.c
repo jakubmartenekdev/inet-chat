@@ -103,7 +103,8 @@ void handle_input() {
                 printf("Exiting...\n");
                 exit(0);
             case KEY_ENTER:
-                // input 'h' 'e' 'l' 'l' 'o' '\n' '\0' | '' '' '' ''
+                // name 'f' 'e' 'r' 'o'
+                // input '' '' '' '' 'h' 'e' 'l' 'l' 'o' '\n' '\0' 
                 g_term_config.input[g_term_config.len] = '\n';
                 g_term_config.input[g_term_config.len + 1] = '\0';
 
@@ -215,6 +216,10 @@ int main(int argc, char** argv) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-n") == 0 || strcmp(argv[i], "--name") == 0) {
             if (i + 1 > argc) break;
+            if (strlen(argv[i + 1]) > 10) {
+                print_usage(argv[0]);
+                exit(1);
+            }
             snprintf(net.username, sizeof(net.username), "[%s] ", argv[i + 1]); 
             name_is_set = 1;
         }
