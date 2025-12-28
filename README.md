@@ -2,12 +2,13 @@
 A real-time TCP chat application
 
 >[!WARNING]
-> This is a toy project I made to learn application programming concepts in C and such, is only intended to use for learning and integration test purposes
+> This is a toy project I made to learn application programming in C and such, is only intended to use for learning and integration test purposes
 
 ## Table of Contents
 
 - [Requirements](#requirements)
 - [Installation](#quick-start)
+- [Usage](#usage)
 - [Features](#features)
 - [Changelog](#changelog)
 
@@ -18,14 +19,22 @@ A real-time TCP chat application
 - Makefile (optional but recommended)
 
 ## Quick Start
-> [!NOTE]
-> Type "localhost" for \<server-addr\> if you're testing this on a local machine
 ```
 git clone https://github.com/jakubmartenekdev/inet-chat.git
 cd inet-chat/
 make all DEBUG=0
-sudo make install DEBUG=0 # Optional, avoid typing full path ./build/...
-
+sudo make install DEBUG=0 # Optional, avoid typing full path ./build/debug/bin/<prog>
+```
+## Using build script
+```
+git clone https://github.com/jakubmartenekdev/inet-chat.git
+cd inet-chat/
+./build.sh
+```
+## Usage
+> [!NOTE]
+> Type "localhost" for \<server-addr\> if you're testing this on a local machine
+```
 server <port>
 client <server-addr> <port>
 ```
@@ -38,7 +47,7 @@ client <server-addr> <port>
 - [ ] IPv6 support
 - [ ] UNIX sockets support
 - [x] Makefile
-- [ ] Build script
+- [x] Build script
 - [x] Criterion - testing framework
 - [x] Unit tests
 - [ ] Integrated tests
@@ -47,17 +56,25 @@ client <server-addr> <port>
 
 ## Changelog
 
-### [1.6.4] - 2025 Sat Dec 27
+### [1.7.0] - 2025 Sun Dec 28
 
-### Added
+#### Added
+- Build script to further automate building process
+
+### [1.6.0] - 2025 Sat Dec 27
+
+#### Added
 - Automatic scroll at the end of area buffer
 
-### [1.5.4] - 2025 Fri Dec 26
+#### Changed
+- I changed append buffer to behave slightly differently, it stores char** instead od char* which is basically what vector<string> does, this allows me to have a better control of how I want to render the screen
+
+### [1.5.0] - 2025 Fri Dec 26
 
 #### Added
 - Usage messages
 
-### [1.4.4] - 2025 Mon Dec 22
+### [1.4.1] - 2025 Mon Dec 22
 
 #### Changed
 - Many network programs send and receive buffers suffixed with newline character and without null terminator, so I fixed the code to satisfy this "convention?", anyway, client has better support with third party software like tcpbin, which I tested and it works fine
@@ -66,7 +83,7 @@ client <server-addr> <port>
 - [x] More descriptive usage messages
 - [ ] Add metadata to messages
 
-### [1.4.3] - 2025 Sun Dec 21
+### [1.4.0] - 2025 Sun Dec 21
 
 #### Changed
 - Fixed bug where sent text appeard inline because of incorrect use of a new line character 
@@ -77,12 +94,12 @@ client <server-addr> <port>
 #### To fix
 - [x] Add scroll in the client tui, when the buffer reaches the end of window, scroll automatically
 
-### [1.3.3] - 2025 Sat Dec 20
+### [1.3.1] - 2025 Sat Dec 20
 
 #### Changed
 - Server uses thread pool instead of processes to handle client requests
 
-### [1.3.2] - 2025 Fri Dec 19
+### [1.3.0] - 2025 Fri Dec 19
 
 #### Added
 - Criterion testing framework, controlled with Makefile

@@ -86,8 +86,8 @@ run: $(UTEST_BIN)
 #-----------------------------------
 install:
 	@echo "Installing binaries to /usr/local/bin"
-	cp -i $(TARGET_DIR)/server /usr/local/bin/
-	cp -i $(TARGET_DIR)/client /usr/local/bin/
+	install -m 755 $(TARGET_DIR)/server /usr/local/bin/
+	install -m 755  $(TARGET_DIR)/client /usr/local/bin/
 	@echo "Successfully installed."
 
 uninstall:
