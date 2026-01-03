@@ -103,8 +103,8 @@ void handle_input() {
                 printf("Exiting...\n");
                 exit(0);
             case KEY_ENTER:
-                // name 'f' 'e' 'r' 'o'
-                // input '' '' '' '' 'h' 'e' 'l' 'l' 'o' '\n' '\0' 
+                // TODO: trim input
+                if (g_term_config.len == 0) return;
                 g_term_config.input[g_term_config.len] = '\n';
                 g_term_config.input[g_term_config.len + 1] = '\0';
 
@@ -119,7 +119,6 @@ void handle_input() {
                 bzero(g_term_config.input, g_term_config.len + 1);
                 g_term_config.len = 0;
                 break;
-                // term_cfg         
             case KEY_BACKSPACE:
                 g_term_config.len--;
                 g_term_config.input[g_term_config.len] = '\n';
@@ -184,10 +183,8 @@ void recv_serv_msg() {
     n = read(net.sockfd, buffer, sizeof(buffer));
     if (n > 0) {
         // append buffer accepts strings, thus we need to null terminate read buff
-        // TODO: receive raw bytes from server OR with \n at the end at which point I dont need abuff \n below
         buffer[n] = '\0'; 
         append_to_buffer(&g_append_buffer, buffer);
-        // append_to_buffer(&g_append_buffer, "\n");
     } else if (n == -1) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
             return;
@@ -261,7 +258,6 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    // TODO: study more use cases of fcntl
     int flags = fcntl(net.sockfd, F_GETFL, 0);
     fcntl(net.sockfd, F_SETFL, flags | O_NONBLOCK);
     enable_raw_mode();

@@ -44,12 +44,11 @@ void* spawn_worker(void* args) {
     task* task;
     while (1) {
         // TODO: Add debug log  DEBUG
-        // printf("About to lock in\n");
         pthread_mutex_lock(&queue_mutex);
+        // pthread_mutex_trylock(&queue_mutex);
         while (head_idx == 0) {
             pthread_cond_wait(&queue_cond, &queue_mutex);
         }
-        // printf("Awaken from dark slumber\n");
         task = tasks[0];
         for (int i = 0; i < head_idx - 1; i++)
             tasks[i] = tasks[i + 1];
@@ -62,10 +61,10 @@ void* spawn_worker(void* args) {
 void handle_connection(int clisockfd_idx) {
     char buffer[BUFSIZE];
     message msg;
-    // bzero(&msg, sizeof(msg));
     while (1) {
         bzero(buffer,BUFSIZE);
         bytes_read = read(clisockfd[clisockfd_idx], &buffer, BUFSIZE-1);
+        read(1, "hello", 5);
         if (bytes_read <= 0) {
             if (bytes_read == 0) {
                 printf("Client disconnected (EOF)\n");
@@ -76,9 +75,7 @@ void handle_connection(int clisockfd_idx) {
             break;
         }
         printf("[SERVER] received message: %s\n",buffer);
-        // buffer[bytes_read - 1] = '\0'; // TODO: delete
         memcpy(msg.buffer, buffer, bytes_read);
-        // strcpy(msg.buffer, buffer); // TODO: memcpy
         msg.clisockfd_idx = clisockfd_idx;
         write(pipefd[1], &msg, sizeof(msg));
         kill(getpid(), SIGUSR1);
@@ -171,7 +168,7 @@ int main(int argc, char *argv[]) {
         }
         task t = {
             .execute = handle_connection,
-            .clisockfd_idx = i
+            .clisockfd_idx = i // TODO: uh, take in tempsockfd itself
         };
         enqueue_task(&t);
     }
